@@ -148,11 +148,65 @@ end)
 RegisterNetEvent('rex-bountyhunter:client:paybountyhunter', function(data)
     RSGCore.Functions.GetPlayerData(function(PlayerData)
         if PlayerData.job.type == "leo" then
-            print(data.reward, data.citizenid)
+            RSGCore.Functions.TriggerCallback('rex-bountyhunter:server:getrewardplayers', function(players)
+                local options = {}
+                for k, v in pairs(players) do
+                    options[#options + 1] = {
+                        title = 'ID: ' ..v.id..' | '..v.name,
+                        icon = 'fa-solid fa-circle-user',
+                        event = 'rex-bountyhunter:client:giveplayerbounty',
+                        args = { 
+                            rewardplayer = v.id,
+                            rewardplayername = v.name,
+                            rewardamount = data.reward,
+                            bountyplayer = data.citizenid
+                        },
+                        arrow = true,
+                    }
+                end
+                lib.registerContext({
+                    id = 'leo_givebounty',
+                    title = 'Bounty Reward',
+                    menu = 'outlaw_menu',
+                    position = 'top-right',
+                    options = options
+                })
+                lib.showContext('leo_givebounty')
+            end)
         else
             lib.notify({ title = 'You are not Law Enforcement', type = 'inform', duration = 7000 })
         end
     end)
+end)
+
+--------------------------------
+-- confirm payment
+--------------------------------
+RegisterNetEvent('rex-bountyhunter:client:giveplayerbounty', function(data)
+    local input = lib.inputDialog('Pay '..data.rewardplayername, {
+        {
+            label = 'Confirm Payment of $'..data.rewardamount,
+            type = 'select',
+            options = {
+                { value = 'yes', label = 'Yes' },
+                { value = 'no',  label = 'No' }
+            },
+            required = true
+        },
+    })
+
+    -- check there is an input
+    if not input then
+        return 
+    end
+
+    -- if no then return
+    if input[1] == 'no' then
+        return
+    end
+
+    TriggerServerEvent('rex-bountyhunter:server:payplayer', data)
+
 end)
 
 --------------------------------

@@ -13,6 +13,9 @@ RSGCore.Functions.CreateCallback('rex-bountyhunter:server:getplayers', function(
     end)
 end)
 
+---------------------------------
+-- add bounty to player
+---------------------------------
 RegisterNetEvent('rex-bountyhunter:server:addplayerbounty', function(amount, newreward, citizenid)
     local src = source
     local Player = RSGCore.Functions.GetPlayer(src)
@@ -29,4 +32,34 @@ RegisterNetEvent('rex-bountyhunter:server:addplayerbounty', function(amount, new
     else
         TriggerClientEvent('ox_lib:notify', src, {title = 'Not Enough Cash! $' .. amount, description = 'you need more cash to do that!', type = 'error', duration = 7000 })
     end
+end)
+
+---------------------------------
+-- get players for reward
+---------------------------------
+RSGCore.Functions.CreateCallback('rex-bountyhunter:server:getrewardplayers', function(source, cb)
+    local src = source
+    local players = {}
+    for k,v in pairs(RSGCore.Functions.GetPlayers()) do
+        local target = GetPlayerPed(v)
+        local ped = RSGCore.Functions.GetPlayer(v)
+        players[#players + 1] = {
+        name = ped.PlayerData.charinfo.firstname .. ' ' .. ped.PlayerData.charinfo.lastname .. ' | (' .. GetPlayerName(v) .. ')',
+        id = v,
+        coords = GetEntityCoords(target),
+        citizenid = ped.PlayerData.citizenid,
+        sources = GetPlayerPed(ped.PlayerData.source),
+        sourceplayer = ped.PlayerData.source
+        }
+    end
+
+    table.sort(players, function(a, b)
+        return a.id < b.id
+    end)
+
+    cb(players)
+end)
+
+RegisterNetEvent('rex-bountyhunter:server:payplayer', function(data)
+    print(data.rewardplayer, data.rewardplayername, data.rewardamount, data.bountyplayer)
 end)
