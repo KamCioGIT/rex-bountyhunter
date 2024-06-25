@@ -27,7 +27,7 @@ local function sortOrder(a, b)
 end
 
 --------------------------------
--- players options menu
+-- bounty board
 --------------------------------
 RegisterNetEvent('rex-bountyhunter:client:openboard', function()
     RSGCore.Functions.TriggerCallback('rex-bountyhunter:server:getplayers', function(data)
@@ -48,16 +48,85 @@ RegisterNetEvent('rex-bountyhunter:client:openboard', function()
                     title = firstname..' '..lastname..' ('..citizenid..')',
                     description = 'bounty reward : $'..outlawstatus,
                     icon = 'fa-solid fa-mask',
+                    event = 'rex-bountyhunter:client:viewoutlaw',
+                    args = {
+                        firstname = firstname,
+                        lastname = lastname,
+                        citizenid = citizenid,
+                        reward = outlawstatus
+                    },
+                    arrow = true
                 }
             end
         end
         lib.registerContext({
             id = 'main_menu',
             title = 'Wanted Outlaws',
-            onBack = function() end,
             position = 'top-right',
             options = options
         })
         lib.showContext('main_menu')
+    end)
+end)
+
+--------------------------------
+-- view outlaw
+--------------------------------
+RegisterNetEvent('rex-bountyhunter:client:viewoutlaw', function(data)
+    lib.registerContext({
+        id = 'outlaw_menu',
+        menu = 'main_menu',
+        title = 'Outlaw '..data.firstname..' '..data.lastname,
+        options = {
+            {
+                title = 'Add Bounty (Law Only)',
+                description = 'add bounty to a player',
+                icon = 'fa-solid fa-money-bill-transfer',
+                event = 'rex-bountyhunter:client:addplayerbounty',
+                args = {
+                    reward = data.reward,
+                    citizenid = data.citizenid,
+                },
+                arrow = true
+            },
+            {
+                title = 'Pay Bounty (Law Only)',
+                description = 'pay bounty of $'..data.reward..' to player',
+                icon = 'fa-solid fa-money-bill-transfer',
+                event = 'rex-bountyhunter:client:paybountyhunter',
+                args = {
+                    reward = data.reward,
+                    citizenid = data.citizenid,
+                },
+                arrow = true
+            },
+        }
+    })
+    lib.showContext('outlaw_menu')
+end)
+
+--------------------------------
+-- add more bounty to an outlaw
+--------------------------------
+RegisterNetEvent('rex-bountyhunter:client:addplayerbounty', function(data)
+    RSGCore.Functions.GetPlayerData(function(PlayerData)
+        if PlayerData.job.type == "leo" then
+            print(data.reward, data.citizenid)
+        else
+            lib.notify({ title = 'You are not Law Enforcement', type = 'inform', duration = 7000 })
+        end
+    end)
+end)
+
+--------------------------------
+-- pay bounty
+--------------------------------
+RegisterNetEvent('rex-bountyhunter:client:paybountyhunter', function(data)
+    RSGCore.Functions.GetPlayerData(function(PlayerData)
+        if PlayerData.job.type == "leo" then
+            print(data.reward, data.citizenid)
+        else
+            lib.notify({ title = 'You are not Law Enforcement', type = 'inform', duration = 7000 })
+        end
     end)
 end)
