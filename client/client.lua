@@ -14,6 +14,14 @@ CreateThread(function()
                     TriggerEvent('rex-bountyhunter:client:openboard')
                 end
             },
+            {
+                type = 'client',
+                icon = 'far fa-eye',
+                label = 'Create New Bounty',
+                action = function()
+                    TriggerEvent('rex-bountyhunter:client:createbounty')
+                end
+            },
         },
         distance = 3
     })
@@ -129,4 +137,11 @@ RegisterNetEvent('rex-bountyhunter:client:paybountyhunter', function(data)
             lib.notify({ title = 'You are not Law Enforcement', type = 'inform', duration = 7000 })
         end
     end)
+end)
+
+--------------------------------
+-- create bounty
+--------------------------------
+RegisterNetEvent('rex-bountyhunter:client:createbounty', function()
+	print('create bounty workings')
 end)
