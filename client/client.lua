@@ -119,7 +119,23 @@ end)
 RegisterNetEvent('rex-bountyhunter:client:addplayerbounty', function(data)
     RSGCore.Functions.GetPlayerData(function(PlayerData)
         if PlayerData.job.type == "leo" then
-            print(data.reward, data.citizenid)
+
+            local input = lib.inputDialog('Addtional Bounty', {
+                { 
+                    label = 'Amount',
+                    type = 'input',
+                    required = true,
+                    icon = 'fa-solid fa-dollar-sign'
+                },
+            })
+    
+            if not input then
+                return
+            end
+            
+            local newreward = (input[1] + data.reward)
+            TriggerServerEvent('rex-bountyhunter:server:addplayerbounty', input[1], newreward, data.citizenid)
+
         else
             lib.notify({ title = 'You are not Law Enforcement', type = 'inform', duration = 7000 })
         end
@@ -143,5 +159,5 @@ end)
 -- create bounty
 --------------------------------
 RegisterNetEvent('rex-bountyhunter:client:createbounty', function()
-	print('create bounty workings')
+    print('create bounty workings')
 end)
