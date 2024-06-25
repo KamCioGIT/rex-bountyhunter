@@ -1,7 +1,9 @@
 local RSGCore = exports['rsg-core']:GetCoreObject()
 
+--------------------------------
+-- target bounty board
+--------------------------------
 CreateThread(function()
-    -- create target for the entity
     exports['rsg-target']:AddTargetModel(Config.BountyBoards, {
         options = {
             {
@@ -15,10 +17,18 @@ CreateThread(function()
         },
         distance = 3
     })
-    -- end of target
 end)
 
+--------------------------------
+-- sort table function
+--------------------------------
+local function sortOrder(a, b)
+    return a.value < b.value
+end
+
+--------------------------------
 -- players options menu
+--------------------------------
 RegisterNetEvent('rex-bountyhunter:client:openboard', function()
     RSGCore.Functions.TriggerCallback('rex-bountyhunter:server:getplayers', function(data)
         local options = {}
@@ -29,6 +39,10 @@ RegisterNetEvent('rex-bountyhunter:client:openboard', function()
             local lastname = character.lastname
             local citizenid = value.citizenid
             local outlawstatus = metadata.outlawstatus
+
+            -- table sort
+            table.sort(options, sortOrder)
+
             if outlawstatus >= 100 then
                 options[#options + 1] = {
                     title = firstname..' '..lastname..' ('..citizenid..')',
