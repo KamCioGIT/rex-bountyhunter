@@ -96,6 +96,7 @@ RegisterNetEvent('rex-bountyhunter:server:createnewbounty', function(data, bount
             Player.Functions.RemoveMoney('cash', amount)
             MySQL.update('UPDATE players SET outlawstatus = ? WHERE citizenid = ?', { bountyamount, data.citizenid })
             TriggerClientEvent('ox_lib:notify', src, {title = 'Bounty Added!', type = 'success', duration = 7000 })
+            TriggerEvent('rsg-log:server:CreateLog', 'outlaw', 'New Bounty Created', 'green', 'Bounty created : '..data.firstname..' '..data.lastname..' for $'..bountyamount)
         else
             TriggerClientEvent('ox_lib:notify', src, {title = 'Not enough cash!', type = 'error', duration = 7000 })
         end
