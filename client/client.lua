@@ -92,6 +92,8 @@ RegisterNetEvent('rex-bountyhunter:client:viewoutlaw', function(data)
                 icon = 'fa-solid fa-money-bill-transfer',
                 event = 'rex-bountyhunter:client:addplayerbounty',
                 args = {
+                    firstname = data.firstname,
+                    lastname = data.lastname,
                     reward = data.reward,
                     citizenid = data.citizenid,
                 },
@@ -103,6 +105,8 @@ RegisterNetEvent('rex-bountyhunter:client:viewoutlaw', function(data)
                 icon = 'fa-solid fa-money-bill-transfer',
                 event = 'rex-bountyhunter:client:paybountyhunter',
                 args = {
+                    firstname = data.firstname,
+                    lastname = data.lastname,
                     reward = data.reward,
                     citizenid = data.citizenid,
                 },
@@ -133,7 +137,7 @@ RegisterNetEvent('rex-bountyhunter:client:addplayerbounty', function(data)
             end
             
             local newreward = (tonumber(input[1]) or 0) + data.reward
-            TriggerServerEvent('rex-bountyhunter:server:addplayerbounty', input[1], newreward, data.citizenid)
+            TriggerServerEvent('rex-bountyhunter:server:addplayerbounty', input[1], newreward, data)
         else
             lib.notify({ title = 'You are not Law Enforcement', type = 'inform', duration = 7000 })
         end
@@ -157,7 +161,9 @@ RegisterNetEvent('rex-bountyhunter:client:paybountyhunter', function(data)
                             rewardplayer = v.id,
                             rewardplayername = v.name,
                             rewardamount = data.reward,
-                            bountyplayer = data.citizenid
+                            bountycitizenid = data.citizenid,
+                            bountyfirstname = data.firstname,
+                            bountylastname = data.lastname
                         },
                         arrow = true,
                     }

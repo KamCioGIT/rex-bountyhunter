@@ -16,7 +16,7 @@ end)
 ---------------------------------
 -- add bounty to player
 ---------------------------------
-RegisterNetEvent('rex-bountyhunter:server:addplayerbounty', function(amount, newreward, citizenid)
+RegisterNetEvent('rex-bountyhunter:server:addplayerbounty', function(amount, newreward, data)
     local src = source
     local Player = RSGCore.Functions.GetPlayer(src)
     if Player.PlayerData.job.type ~= "leo" then
@@ -25,8 +25,9 @@ RegisterNetEvent('rex-bountyhunter:server:addplayerbounty', function(amount, new
     end
     
     if newreward < Config.MaxBounty then
-        MySQL.update('UPDATE players SET outlawstatus = ? WHERE citizenid = ?', { newreward, citizenid })
+        MySQL.update('UPDATE players SET outlawstatus = ? WHERE citizenid = ?', { newreward, data.citizenid })
         TriggerClientEvent('ox_lib:notify', src, {title = 'Additional Bounty Added!', type = 'success', duration = 7000 })
+        TriggerEvent('rsg-log:server:CreateLog', 'outlaw', 'Bounty Raised', 'green', '💰 WANTED dead or alive '..data.firstname..' '..data.lastname..' reward $'..newreward)
     else
         TriggerClientEvent('ox_lib:notify', src, {title = 'Max Bounty Reached!', type = 'info', duration = 7000 })
     end
@@ -70,9 +71,10 @@ RegisterNetEvent('rex-bountyhunter:server:payplayer', function(data)
     local RewardPlayer = RSGCore.Functions.GetPlayer(tonumber(data.rewardplayer))
     if RewardPlayer then
         RewardPlayer.Functions.AddMoney('cash', tonumber(data.rewardamount))
-        MySQL.update('UPDATE players SET outlawstatus = ? WHERE citizenid = ?', { 0, data.bountyplayer })
+        MySQL.update('UPDATE players SET outlawstatus = ? WHERE citizenid = ?', { 0, data.bountycitizenid })
         TriggerClientEvent('ox_lib:notify', src, {title = 'Bounty Paid!', type = 'success', duration = 7000 })
         TriggerClientEvent('ox_lib:notify', RewardPlayer.PlayerData.source, {title = 'You received a bounty reward of $'..data.rewardamount, type = 'success', duration = 7000 })
+        TriggerEvent('rsg-log:server:CreateLog', 'outlaw', 'Outlaw Captured', 'green', '🔒 '..data.bountyfirstname..' '..data.bountylastname..' has been captured and reward $'..data.rewardamount..' paid')
     else
         TriggerClientEvent('ox_lib:notify', src, {title = 'Player Not Found', type = 'error', duration = 7000 })
     end
@@ -89,14 +91,14 @@ RegisterNetEvent('rex-bountyhunter:server:createnewbounty', function(data, bount
     if jobtype == 'leo' then
         MySQL.update('UPDATE players SET outlawstatus = ? WHERE citizenid = ?', { bountyamount, data.citizenid })
         TriggerClientEvent('ox_lib:notify', src, {title = 'Bounty Added!', type = 'success', duration = 7000 })
-        TriggerEvent('rsg-log:server:CreateLog', 'outlaw', 'New Bounty Created', 'green', 'Bounty created : '..data.firstname..' '..data.lastname..' for $'..bountyamount)
+        TriggerEvent('rsg-log:server:CreateLog', 'outlaw', 'New Bounty Created', 'green', '💰 WANTED dead or alive '..data.firstname..' '..data.lastname..' reward $'..bountyamount)
     else
         local cashBalance = Player.PlayerData.money['cash']
         if cashBalance >= amount then
             Player.Functions.RemoveMoney('cash', amount)
             MySQL.update('UPDATE players SET outlawstatus = ? WHERE citizenid = ?', { bountyamount, data.citizenid })
             TriggerClientEvent('ox_lib:notify', src, {title = 'Bounty Added!', type = 'success', duration = 7000 })
-            TriggerEvent('rsg-log:server:CreateLog', 'outlaw', 'New Bounty Created', 'green', 'Bounty created : '..data.firstname..' '..data.lastname..' for $'..bountyamount)
+            TriggerEvent('rsg-log:server:CreateLog', 'outlaw', 'New Bounty Created', 'green', '💰 WANTED dead or alive '..data.firstname..' '..data.lastname..' reward $'..bountyamount)
         else
             TriggerClientEvent('ox_lib:notify', src, {title = 'Not enough cash!', type = 'error', duration = 7000 })
         end
